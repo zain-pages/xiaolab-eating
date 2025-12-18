@@ -4,176 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0," user-scalable=no>
     <title>XiaoLab 吃什么</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .container {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .logo {
-            max-width: 300px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            color: #003366;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-        }
-        
-        .restaurant-list {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-        }
-        
-        .list-title {
-            color: #003366;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .restaurant-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .restaurant-item {
-            background: #f8fafd;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 1.1rem;
-            color: #333;
-            border-left: 4px solid #003366;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .restaurant-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0, 51, 102, 0.1);
-        }
-        
-        .selection-area {
-            text-align: center;
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-        }
-        
-        .result-container {
-            min-height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 30px 0;
-            background: #f8fafd;
-            border-radius: 10px;
-            padding: 20px;
-            border: 2px dashed #ddd;
-            transition: all 0.3s ease;
-        }
-        
-        .result-placeholder {
-            color: #999;
-            font-size: 1.2rem;
-        }
-        
-        .selected-restaurant {
-            font-size: 2rem;
-            color: #003366;
-            font-weight: bold;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .select-button {
-            background: #003366;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.3rem;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2);
-        }
-        
-        .select-button:hover {
-            background: #00509e;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 51, 102, 0.3);
-        }
-        
-        .select-button:active {
-            transform: translateY(1px);
-        }
-        
-        footer {
-            text-align: center;
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            width: 100%;
-        }
-        
-        @media (max-width: 600px) {
-            .restaurant-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .selected-restaurant {
-                font-size: 1.5rem;
-            }
-            
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <div class="container">
@@ -207,18 +38,9 @@
     </div>
 
     <script>
-        // XiaoLab严选精品饭店数据（只有名字）
-        const restaurants = shuffle([
-            "桂林小吃",
-            "好好食堂", 
-            "明治与你",
-            "台湾小食堂",
-            "院楼对面羊肉粉",
-            "安记茶餐厅",
-            "野人食堂",
-            "东北饺子馆",
-            "天马牛肉饼二楼",
-        ]);
+        // XiaoLab严选精品饭店数据通过 config.json 加载
+        let restaurants = [];
+
         function shuffle(array) {
           const arr = [...array]; // 创建副本，不修改原数组
           for (let i = arr.length - 1; i > 0; i--) {
@@ -245,9 +67,37 @@
                 restaurantGrid.appendChild(restaurantItem);
             });
         }
+
+        function loadConfig() {
+            fetch('config.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load config.json');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data.restaurants)) {
+                        restaurants = shuffle(data.restaurants);
+                        initializeRestaurantList();
+                    } else {
+                        console.error('Invalid config.json format');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading config.json:', error);
+                    resultPlaceholder.textContent = 'Failed to load restaurants';
+                });
+        }
         
         // 随机选择饭店
         function selectRandomRestaurant() {
+            if (!restaurants.length) {
+                resultPlaceholder.style.display = 'block';
+                selectedRestaurant.style.display = 'none';
+                resultPlaceholder.textContent = 'No restaurants available';
+                return;
+            }
             // 随机选择一个索引
             const randomIndex = Math.floor(Math.random() * restaurants.length);
             const selected = restaurants[randomIndex];
@@ -293,7 +143,7 @@
         
         // 初始化页面
         document.addEventListener('DOMContentLoaded', () => {
-            initializeRestaurantList();
+            loadConfig();
         });
     </script>
 </body>
